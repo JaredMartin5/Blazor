@@ -1,10 +1,4 @@
-﻿namespace Shared;
-
-public class RegisterResult
-{
-    public bool Successful { get; set; }
-    public IEnumerable<Error> Errors { get; set; } = new List<Error>();
-}
+﻿namespace Shared.Common;
 
 public class Error
 {

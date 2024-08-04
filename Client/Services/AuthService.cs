@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Shared;
+using Shared.Login;
+using Shared.Register;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;

@@ -1,4 +1,5 @@
-﻿using Shared;
+﻿using Shared.Login;
+using Shared.Register;
 
 namespace Client.Services;
 

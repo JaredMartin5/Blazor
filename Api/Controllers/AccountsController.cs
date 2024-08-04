@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Api.Account;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Shared.Register;
 
 namespace Api.Controllers;
 
@@ -8,27 +9,21 @@ namespace Api.Controllers;
 [ApiController]
 public class AccountsController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly IMediator _mediator;
 
-    public AccountsController(UserManager<IdentityUser> userManager)
+    public AccountsController(IMediator mediator)
     {
-        _userManager = userManager;
+        _mediator = mediator;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] RegisterModel model)
+    public async Task<IActionResult> Post([FromBody] RegisterModel registerModel)
     {
-        var newUser = new IdentityUser { UserName = model.Email, Email = model.Email };
-
-        var result = await _userManager.CreateAsync(newUser, model.Password);
-
-        if (!result.Succeeded)
+        var result = await _mediator.Send(new CreateAccountCommand
         {
-            var errors = result.Errors.Select(e => new Error(nameof(RegisterModel.Email), e.Description)).ToList();
+            RegisterModel = registerModel
+        });
 
-            return Ok(new RegisterResult { Successful = false, Errors = errors });
-        }
-
-        return Ok(new RegisterResult { Successful = true });
+        return result.Successful ? Ok(result) : BadRequest(result);
     }
 }

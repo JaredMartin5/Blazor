@@ -1,6 +1,7 @@
 ﻿@page "/register"
 @using Shared
 @using Client.Services
+@using Shared.Register
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
@@ -9,9 +10,9 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm EditContext="@editContext" OnSubmit="HandleRegistration">
+        <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
             <DataAnnotationsValidator />
-            
+
             <div class="form-group">
                 <label for="email">Email address</label>
                 <InputText Id="email" class="form-control" @bind-Value="RegisterModel.Email" />
@@ -41,24 +42,36 @@
         editContext = new EditContext(RegisterModel);
     }
 
-    private async Task HandleRegistration()
+    private async Task HandleSubmit()
     {
+        // Perform client-side validation
+    
+            // Clear previous validation messages
+            ValidationHelper.ClearAllValidationMessages(editContext);
 
-        ValidationHelper.ClearAllValidationMessages(editContext);
+            editContext.Validate();
 
-        var result = await AuthService.Register(RegisterModel);
+            // Perform the registration process
+            var result = await AuthService.Register(RegisterModel);
 
-        if (!result.Successful)
-        {
-            foreach (var error in result.Errors)
+            if (!result.Successful)
             {
-                var correctedPropertyName = error.Property.Substring(0, 1).ToUpper() + error.Property.Substring(1);
-                ValidationHelper.AddValidationError(editContext, RegisterModel, correctedPropertyName, error.Message);
+                // Add server-side validation errors to the EditContext
+                foreach (var error in result.Errors)
+                {
+                    var correctedPropertyName = error.Property.Substring(0, 1).ToUpper() + error.Property.Substring(1);
+                    ValidationHelper.AddValidationError(editContext, RegisterModel, correctedPropertyName, error.Message);
+                }
+
+                // Trigger a UI update to show validation messages
+                editContext.NotifyValidationStateChanged();
             }
-        }
-        else
-        {
-            NavigationManager.NavigateTo("/login");
-        }
+            else
+            {
+                // Navigate to the login page on successful registration
+                NavigationManager.NavigateTo("/login");
+            }
+        
     }
 }
+
