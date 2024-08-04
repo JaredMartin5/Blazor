@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Shared.Common;
 using Shared.Register;
@@ -30,9 +29,9 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         {
             var errors = result.Errors.Select(e => new Error(nameof(RegisterModel.Email), e.Description)).ToList();
 
-            return new ApiResult { Errors = errors };
+            return new ApiResult { Successful = false, Errors = errors };
         }
 
-        return new ApiResult();
+        return new ApiResult { Successful = true };
     }
 }

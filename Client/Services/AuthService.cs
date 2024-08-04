@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Shared.Common;
 
 namespace Client.Services;
 
@@ -24,11 +25,11 @@ public class AuthService : IAuthService
         _localStorage = localStorage;
     }
 
-    public async Task<RegisterResult> Register(RegisterModel registerModel)
+    public async Task<ApiResult> Register(RegisterModel registerModel)
     {
         var result = await _httpClient.PostAsJsonAsync("api/accounts", registerModel);
 
-        var passedResult = await result.Content.ReadFromJsonAsync<RegisterResult>();
+        var passedResult = await result.Content.ReadFromJsonAsync<ApiResult>();
 
         return passedResult;
     }
