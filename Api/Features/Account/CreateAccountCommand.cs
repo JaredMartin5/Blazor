@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Shared.Common;
 using Shared.Register;
 
-namespace Api.Account;
+namespace Api.Features.Account;
 
 public class CreateAccountCommand : IRequest<ApiResult>
 {

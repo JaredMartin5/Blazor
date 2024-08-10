@@ -1,5 +1,4 @@
 ﻿@page "/login"
-@using Shared
 @using Client.Services
 @using Shared.Login
 @inject IAuthService AuthService
@@ -7,19 +6,11 @@
 
 <h1>Login</h1>
 
-@if (ShowErrors)
-{
-    <div class="alert alert-danger" role="alert">
-        <p>@Error</p>
-    </div>
-}
-
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <EditForm EditContext="@editContext" OnSubmit="HandleLogin">
             <DataAnnotationsValidator />
-            <ValidationSummary />
 
             <div class="form-group">
                 <label for="email">Email address</label>
@@ -39,23 +30,34 @@
 @code {
 
     private LoginModel loginModel = new();
-    private bool ShowErrors;
-    private string Error = "";
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(loginModel);
+    }
 
     private async Task HandleLogin()
     {
-        ShowErrors = false;
+        ValidationHelper.ClearAllValidationMessages(editContext);
+
+        editContext.Validate();
 
         var result = await AuthService.Login(loginModel);
 
-        if (result.Successful)
+        if (!result.Successful)
         {
-            NavigationManager.NavigateTo("/");
+            foreach (var error in result.Errors)
+            {
+                var correctedPropertyName = error.Property.Substring(0, 1).ToUpper() + error.Property.Substring(1);
+                ValidationHelper.AddValidationError(editContext, loginModel, correctedPropertyName, error.Message);
+            }
+
+            editContext.NotifyValidationStateChanged();
         }
         else
         {
-            Error = result.Error;
-            ShowErrors = true;
+            NavigationManager.NavigateTo("/");
         }
     }
 

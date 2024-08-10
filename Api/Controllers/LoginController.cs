@@ -1,11 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Api.Features.Account;
+using Api.Features.Login;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Shared;
 using Shared.Login;
+using Shared.Register;
 
 namespace Api.Controllers;
 
@@ -13,46 +17,21 @@ namespace Api.Controllers;
 [ApiController]
 public class LoginController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IMediator _mediator;
 
-    public LoginController(IConfiguration configuration,
-        SignInManager<IdentityUser> signInManager)
+    public LoginController(IMediator mediator)
     {
-        _configuration = configuration;
-        _signInManager = signInManager;
+        _mediator = mediator;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody] LoginModel login)
+    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
     {
-        var result = await _signInManager.PasswordSignInAsync(login.Email, login.Password, false, false);
-
-        if (!result.Succeeded)
-            return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
-
-        var claims = new[]
+        var result = await _mediator.Send(new LoginCommand
         {
-            new Claim(ClaimTypes.Name, login.Email)
-        };
+            LoginModel = loginModel
+        });
 
-        var keyString = _configuration["JwtSecurityKey"] ?? string.Empty;
-        if (keyString.Length < 32)
-            return BadRequest(new LoginResult
-                { Successful = false, Error = "Security key is too short. It must be at least 32 characters long." });
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiry = DateTime.Now.AddDays(Convert.ToInt32(_configuration["JwtExpiryInDays"]));
-
-        var token = new JwtSecurityToken(
-            _configuration["JwtIssuer"],
-            _configuration["JwtAudience"],
-            claims,
-            expires: expiry,
-            signingCredentials: creds
-        );
-
-        return Ok(new LoginResult { Successful = true, Token = new JwtSecurityTokenHandler().WriteToken(token) });
+        return result.Successful ? Ok(result) : BadRequest(result);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Api.Account;
+﻿using Api.Features.Account;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Register;

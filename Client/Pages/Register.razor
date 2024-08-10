@@ -43,34 +43,25 @@
 
     private async Task HandleSubmit()
     {
-        // Perform client-side validation
-    
-            // Clear previous validation messages
             ValidationHelper.ClearAllValidationMessages(editContext);
 
             editContext.Validate();
 
-            // Perform the registration process
             var result = await AuthService.Register(RegisterModel);
 
             if (!result.Successful)
             {
-                // Add server-side validation errors to the EditContext
                 foreach (var error in result.Errors)
                 {
                     var correctedPropertyName = error.Property.Substring(0, 1).ToUpper() + error.Property.Substring(1);
                     ValidationHelper.AddValidationError(editContext, RegisterModel, correctedPropertyName, error.Message);
                 }
 
-                // Trigger a UI update to show validation messages
                 editContext.NotifyValidationStateChanged();
             }
             else
             {
-                // Navigate to the login page on successful registration
                 NavigationManager.NavigateTo("/login");
             }
-        
     }
 }
-
