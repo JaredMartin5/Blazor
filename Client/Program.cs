@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Client.Helpers;
 using Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -17,7 +18,7 @@ namespace Client
             builder.Services.AddAuthorizationCore();
             builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-
+            builder.Services.AddScoped<FormSubmissionHelper>();
 
             builder.Services.AddScoped(sp => new HttpClient
                 { BaseAddress = new Uri("https://localhost:7109/api") });

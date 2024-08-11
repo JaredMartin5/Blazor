@@ -1,8 +1,10 @@
 ﻿@page "/register"
 @using Client.Services
 @using Shared.Register
+@using Client.Helpers
 @inject IAuthService AuthService
-@inject NavigationManager NavigationManager
+@inject FormSubmissionHelper FormHelper
+
 
 <h1>Register</h1>
 
@@ -43,25 +45,6 @@
 
     private async Task HandleSubmit()
     {
-            ValidationHelper.ClearAllValidationMessages(editContext);
-
-            editContext.Validate();
-
-            var result = await AuthService.Register(RegisterModel);
-
-            if (!result.Successful)
-            {
-                foreach (var error in result.Errors)
-                {
-                    var correctedPropertyName = error.Property.Substring(0, 1).ToUpper() + error.Property.Substring(1);
-                    ValidationHelper.AddValidationError(editContext, RegisterModel, correctedPropertyName, error.Message);
-                }
-
-                editContext.NotifyValidationStateChanged();
-            }
-            else
-            {
-                NavigationManager.NavigateTo("/login");
-            }
+        await FormHelper.HandleFormSubmission(editContext, RegisterModel, AuthService.Register, "/login");
     }
 }

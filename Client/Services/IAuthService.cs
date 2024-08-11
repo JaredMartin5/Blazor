@@ -6,7 +6,7 @@ namespace Client.Services;
 
 public interface IAuthService
 {
-    Task<ApiResult> Login(LoginModel loginModel);
+    Task<ApiResult<string>> Login(LoginModel loginModel);
     Task Logout();
-    Task<ApiResult> Register(RegisterModel registerModel);
+    Task<ApiResult<object>> Register(RegisterModel registerModel);
 }

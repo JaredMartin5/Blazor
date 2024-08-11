@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Client.Helpers;
 
 namespace Client.Services;
 
@@ -25,7 +26,7 @@ public class AuthService : IAuthService
         _localStorage = localStorage;
     }
 
-    public async Task<ApiResult> Register(RegisterModel registerModel)
+    public async Task<ApiResult<object>> Register(RegisterModel registerModel)
     {
         var result = await _httpClient.PostAsJsonAsync("api/accounts", registerModel);
 
@@ -34,25 +35,40 @@ public class AuthService : IAuthService
         return passedResult;
     }
 
-    public async Task<ApiResult> Login(LoginModel loginModel)
+    public async Task<ApiResult<string>> Login(LoginModel loginModel)
     {
         var loginAsJson = JsonSerializer.Serialize(loginModel);
         var response = await _httpClient.PostAsync("api/Login",
             new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
-        var loginResult = JsonSerializer.Deserialize<ApiResult>(await response.Content.ReadAsStringAsync(),
+
+        if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+        {
+            return await ErrorResultHelper.CreateErrorResult<string>(nameof(LoginModel.Email));
+        }
+
+        var loginResult = JsonSerializer.Deserialize<ApiResult<string>>(await response.Content.ReadAsStringAsync(),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        if (loginResult is null)
+        {
+            return await ErrorResultHelper.CreateErrorResult<string>(nameof(LoginModel.Email));
+        }
 
         if (!response.IsSuccessStatusCode)
         {
             return loginResult;
         }
 
-        if (loginResult?.Data.ToString() is { } token)
+        var token = loginResult.Data;
+
+        if (token == null)
         {
-            await _localStorage.SetItemAsync("authToken", token);
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginModel.Email);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+            return await ErrorResultHelper.CreateErrorResult<string>(nameof(LoginModel.Email));
         }
+
+        await _localStorage.SetItemAsync("authToken", token);
+        ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(token);
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
 
         return loginResult;
     }
