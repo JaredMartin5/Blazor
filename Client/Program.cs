@@ -20,8 +20,7 @@ namespace Client
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<FormSubmissionHelper>();
 
-            builder.Services.AddScoped(sp => new HttpClient
-                { BaseAddress = new Uri("https://localhost:7109/api") });
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7109/api") });
 
             await builder.Build().RunAsync();
         }

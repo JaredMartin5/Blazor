@@ -13,11 +13,8 @@ public class FormSubmissionHelper
         _navigationManager = navigationManager;
     }
 
-    public async Task HandleFormSubmission<TModel, TResult>(
-        EditContext editContext,
-        TModel model,
-        Func<TModel, Task<ApiResult<TResult>>> submitFunc,
-        string successNavigationUrl) where TResult : class
+    public async Task HandleFormSubmission<TModel, TResult>(EditContext editContext, TModel model, Func<TModel, Task<ApiResult<TResult>>> submitFunc, string successNavigationUrl)
+        where TResult : class
     {
         ValidationHelper.ClearAllValidationMessages(editContext);
         editContext.Validate();

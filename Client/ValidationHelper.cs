@@ -1,18 +1,15 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Client
 {
     public static class ValidationHelper
     {
-        private static readonly ConcurrentDictionary<EditContext, ValidationMessageStore> _validationMessageStores =
-            new();
+        private static readonly ConcurrentDictionary<EditContext, ValidationMessageStore> _validationMessageStores = new();
 
-        public static void AddValidationError(EditContext editContext, object model, string propertyName,
-            string errorMessage)
+        public static void AddValidationError(EditContext editContext, object model, string propertyName, string errorMessage)
         {
-            var messageStore =
-                _validationMessageStores.GetOrAdd(editContext, context => new ValidationMessageStore(context));
+            var messageStore = _validationMessageStores.GetOrAdd(editContext, context => new ValidationMessageStore(context));
 
             var fieldIdentifier = new FieldIdentifier(model, propertyName);
 
