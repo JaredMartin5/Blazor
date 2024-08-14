@@ -1,10 +1,10 @@
-﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
-using Shared;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using Shared;
 
 namespace Client.Services;
 
@@ -14,9 +14,7 @@ public class AuthService : IAuthService
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly ILocalStorageService _localStorage;
 
-    public AuthService(HttpClient httpClient,
-        AuthenticationStateProvider authenticationStateProvider,
-        ILocalStorageService localStorage)
+    public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
         _authenticationStateProvider = authenticationStateProvider;
@@ -35,10 +33,8 @@ public class AuthService : IAuthService
     public async Task<LoginResult> Login(LoginModel loginModel)
     {
         var loginAsJson = JsonSerializer.Serialize(loginModel);
-        var response = await _httpClient.PostAsync("api/Login",
-            new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
-        var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(),
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
+        var loginResult = JsonSerializer.Deserialize<LoginResult>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (!response.IsSuccessStatusCode)
         {
