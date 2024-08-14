@@ -1,10 +1,12 @@
-﻿using Shared;
+﻿using Shared.Common;
+using Shared.Login;
+using Shared.Register;
 
 namespace Client.Services;
 
 public interface IAuthService
 {
-    Task<LoginResult> Login(LoginModel loginModel);
+    Task<ApiResult<string>> Login(LoginModel loginModel);
     Task Logout();
-    Task<RegisterResult> Register(RegisterModel registerModel);
+    Task<ApiResult<object>> Register(RegisterModel registerModel);
 }

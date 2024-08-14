@@ -1,24 +1,18 @@
 ﻿@page "/login"
-@using Shared
 @using Client.Services
+@using Shared.Login
+@using Client.Helpers
 @inject IAuthService AuthService
-@inject NavigationManager NavigationManager
+@inject FormSubmissionHelper FormHelper
+
 
 <h1>Login</h1>
-
-@if (ShowErrors)
-{
-    <div class="alert alert-danger" role="alert">
-        <p>@Error</p>
-    </div>
-}
 
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Please enter your details</h5>
-        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <EditForm EditContext="@editContext" OnSubmit="HandleLogin">
             <DataAnnotationsValidator />
-            <ValidationSummary />
 
             <div class="form-group">
                 <label for="email">Email address</label>
@@ -38,24 +32,15 @@
 @code {
 
     private LoginModel loginModel = new();
-    private bool ShowErrors;
-    private string Error = "";
+    private EditContext editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(loginModel);
+    }
 
     private async Task HandleLogin()
     {
-        ShowErrors = false;
-
-        var result = await AuthService.Login(loginModel);
-
-        if (result.Successful)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-        else
-        {
-            Error = result.Error;
-            ShowErrors = true;
-        }
+        await FormHelper.HandleFormSubmission(editContext, loginModel, AuthService.Login, "/");
     }
-
 }
