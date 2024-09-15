@@ -1,6 +1,7 @@
 ﻿namespace Shared.Common;
 
-public record ApiResult<T> where T : class?
+public record ApiResult<T>
+    where T : class?
 {
     public required bool Successful { get; init; }
 
@@ -9,6 +10,4 @@ public record ApiResult<T> where T : class?
     public T? Data { get; set; }
 }
 
-public record ApiResult : ApiResult<object>
-{
-}
+public record ApiResult : ApiResult<object> { }

@@ -16,25 +16,16 @@ namespace Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection")
-                );
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
             builder.Services.AddValidatorsFromAssemblyContaining<LoginModelValidator>();
 
-            builder
-                .Services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
-            builder.Services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly)
-            );
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
             builder.Services.AddCors(options =>
             {
@@ -42,10 +33,7 @@ namespace Api
                     name: "BlazorCors",
                     policy =>
                     {
-                        policy
-                            .WithOrigins("https://localhost:7141")
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
+                        policy.WithOrigins("https://localhost:7141").AllowAnyHeader().AllowAnyMethod();
                     }
                 );
             });
@@ -62,11 +50,7 @@ namespace Api
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["JwtIssuer"],
                         ValidAudience = builder.Configuration["JwtAudience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(
-                                builder.Configuration["JwtSecurityKey"] ?? string.Empty
-                            )
-                        ),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecurityKey"] ?? string.Empty)),
                     };
                 });
 
