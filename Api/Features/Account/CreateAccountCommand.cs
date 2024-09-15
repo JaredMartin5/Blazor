@@ -1,16 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
+using OneOf;
 using Shared.Common;
 using Shared.Register;
 
 namespace Api.Features.Account;
 
-public class CreateAccountCommand : IRequest<ApiResult>
+public class CreateAccountCommand : IRequest<OneOf<bool, IEnumerable<ApiError>>>
 {
     public RegisterModel RegisterModel { get; set; } = new();
 }
 
-public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, ApiResult>
+public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand, OneOf<bool, IEnumerable<ApiError>>>
 {
     private readonly UserManager<IdentityUser> _userManager;
 
@@ -19,19 +20,16 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         _userManager = userManager;
     }
 
-    public async Task<ApiResult> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<bool, IEnumerable<ApiError>>> Handle(CreateAccountCommand request, CancellationToken cancellationToken)
     {
         var newUser = new IdentityUser { UserName = request.RegisterModel.Email, Email = request.RegisterModel.Email };
-
         var result = await _userManager.CreateAsync(newUser, request.RegisterModel.Password);
 
         if (!result.Succeeded)
         {
-            var errors = result.Errors.Select(e => new Error(nameof(RegisterModel.Email), e.Description)).ToList();
-
-            return new ApiResult { Successful = false, Errors = errors };
+            return result.Errors.Select(e => new ApiError(nameof(RegisterModel.Email), e.Description)).ToList();
         }
 
-        return new ApiResult { Successful = true };
+        return true;
     }
 }

@@ -21,6 +21,6 @@ public class AccountsController : ControllerBase
     {
         var result = await _mediator.Send(new CreateAccountCommand { RegisterModel = registerModel });
 
-        return result.Successful ? Ok(result) : BadRequest(result);
+        return result.Match<IActionResult>(x => Ok(x), BadRequest);
     }
 }

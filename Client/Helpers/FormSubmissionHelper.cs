@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using OneOf;
 using Shared.Common;
 
 namespace Client.Helpers;
@@ -13,27 +14,32 @@ public class FormSubmissionHelper
         _navigationManager = navigationManager;
     }
 
-    public async Task HandleFormSubmission<TModel, TResult>(EditContext editContext, TModel model, Func<TModel, Task<ApiResult<TResult>>> submitFunc, string successNavigationUrl)
-        where TResult : class
+    public async Task HandleFormSubmission<TModel, TResult>(EditContext editContext, TModel model, Func<TModel, Task<OneOf<TResult, List<ApiError>>>> submitFunc, string successNavigationUrl)
     {
         ValidationHelper.ClearAllValidationMessages(editContext);
         editContext.Validate();
 
         var result = await submitFunc(model);
 
-        if (!result.Successful)
-        {
-            foreach (var error in result.Errors)
+        result.Switch(
+            success =>
             {
-                var correctedPropertyName = error.Property[..1].ToUpper() + error.Property[1..];
-                ValidationHelper.AddValidationError(editContext, model, correctedPropertyName, error.Message);
-            }
+                _navigationManager.NavigateTo(successNavigationUrl);
+            },
+            errors =>
+            {
+                if (Equals(model, null))
+                {
+                    throw new Exception("Data is null");
+                }
+                foreach (var error in errors)
+                {
+                    var correctedPropertyName = error.Property[..1].ToUpper() + error.Property[1..];
+                    ValidationHelper.AddValidationError(editContext, model, correctedPropertyName, error.Message);
+                }
 
-            editContext.NotifyValidationStateChanged();
-        }
-        else
-        {
-            _navigationManager.NavigateTo(successNavigationUrl);
-        }
+                editContext.NotifyValidationStateChanged();
+            }
+        );
     }
 }
