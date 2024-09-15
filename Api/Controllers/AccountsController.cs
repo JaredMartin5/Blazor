@@ -1,8 +1,6 @@
 ﻿using Api.Features.Account;
-using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Login;
 using Shared.Register;
 
 namespace Api.Controllers;
