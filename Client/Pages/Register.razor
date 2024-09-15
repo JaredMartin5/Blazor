@@ -11,7 +11,7 @@
     <MudCard>
         <MudCardContent>
             <MudText Typo="Typo.h5">Register</MudText>
-            <DataAnnotationsValidator />
+            <FluentValidationValidator />
 
             <MudTextField Label="Email" Class="mt-3" Required="true"
                           @bind-Value="model.Email" For="@(() => model.Email)" />
