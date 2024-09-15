@@ -5,29 +5,21 @@
 @inject IAuthService AuthService
 @inject FormSubmissionHelper FormHelper
 
+<EditForm EditContext="@editContext" OnSubmit="HandleLogin">
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.h5">Log In</MudText>
+            <FluentValidationValidator />
 
-<h1>Login</h1>
+            <MudTextField @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" Label="Email address" Required="true" />
+            <MudTextField @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" Label="Password" InputType="InputType.Password" Required="true" />
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Please enter your details</h5>
-        <EditForm EditContext="@editContext" OnSubmit="HandleLogin">
-            <DataAnnotationsValidator />
-
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <InputText Id="email" Class="form-control" @bind-Value="loginModel.Email" />
-                <ValidationMessage For="@(() => loginModel.Email)" />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <InputText Id="password" type="password" Class="form-control" @bind-Value="loginModel.Password" />
-                <ValidationMessage For="@(() => loginModel.Password)" />
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </EditForm>
-    </div>
-</div>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+                </MudCardActions>
+    </MudCardContent>
+</MudCard>
+</EditForm>
 
 @code {
 

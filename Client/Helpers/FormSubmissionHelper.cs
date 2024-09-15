@@ -17,10 +17,17 @@ public class FormSubmissionHelper
         EditContext editContext,
         TModel model,
         Func<TModel, Task<ApiResult<TResult>>> submitFunc,
-        string successNavigationUrl) where TResult : class
+        string successNavigationUrl
+    )
+        where TResult : class
     {
         ValidationHelper.ClearAllValidationMessages(editContext);
         editContext.Validate();
+
+        if (!editContext.Validate())
+        {
+            return;
+        }
 
         var result = await submitFunc(model);
 
@@ -29,7 +36,12 @@ public class FormSubmissionHelper
             foreach (var error in result.Errors)
             {
                 var correctedPropertyName = error.Property[..1].ToUpper() + error.Property[1..];
-                ValidationHelper.AddValidationError(editContext, model, correctedPropertyName, error.Message);
+                ValidationHelper.AddValidationError(
+                    editContext,
+                    model,
+                    correctedPropertyName,
+                    error.Message
+                );
             }
 
             editContext.NotifyValidationStateChanged();

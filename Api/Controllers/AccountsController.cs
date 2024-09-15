@@ -1,6 +1,8 @@
 ﻿using Api.Features.Account;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Login;
 using Shared.Register;
 
 namespace Api.Controllers;
@@ -19,10 +21,9 @@ public class AccountsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] RegisterModel registerModel)
     {
-        var result = await _mediator.Send(new CreateAccountCommand
-        {
-            RegisterModel = registerModel
-        });
+        var result = await _mediator.Send(
+            new CreateAccountCommand { RegisterModel = registerModel }
+        );
 
         return result.Successful ? Ok(result) : BadRequest(result);
     }

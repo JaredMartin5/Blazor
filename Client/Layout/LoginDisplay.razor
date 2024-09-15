@@ -1,9 +1,11 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="LogOut">Log out</a>
+        <MudText>
+            <a href="LogOut">Log out</a>
+        </MudText>
     </Authorized>
     <NotAuthorized>
-        <a href="Register">Register</a>
-        <a href="Login">Log in</a>
+        <MudLink Href="Register" Style="@($"color:{Colors.Shades.White} !important;")">Register</MudLink>
+        <MudLink Href="Login" Style="@($"color:{Colors.Shades.White} !important;")">Log in</MudLink>
     </NotAuthorized>
 </AuthorizeView>

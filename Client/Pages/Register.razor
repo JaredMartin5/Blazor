@@ -1,50 +1,44 @@
 ﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@using Client.Helpers
 @using Client.Services
 @using Shared.Register
-@using Client.Helpers
+@using MudBlazor
 @inject IAuthService AuthService
 @inject FormSubmissionHelper FormHelper
 
-
-<h1>Register</h1>
-
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Please enter your details</h5>
-        <EditForm EditContext="@editContext" OnSubmit="HandleSubmit">
+<EditForm EditContext="@editContext" OnSubmit="OnSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">Register</MudText>
             <DataAnnotationsValidator />
 
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <InputText Id="email" class="form-control" @bind-Value="RegisterModel.Email" />
-                <ValidationMessage For="@(() => RegisterModel.Email)" />
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <InputText Id="password" type="password" class="form-control" @bind-Value="RegisterModel.Password" />
-                <ValidationMessage For="@(() => RegisterModel.Password)" />
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <InputText Id="confirmPassword" type="password" class="form-control" @bind-Value="RegisterModel.ConfirmPassword" />
-                <ValidationMessage For="@(() => RegisterModel.ConfirmPassword)" />
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </EditForm>
-    </div>
-</div>
+            <MudTextField Label="Email" Class="mt-3" Required="true"
+                          @bind-Value="model.Email" For="@(() => model.Email)" />
+            <MudTextField Label="Password" HelperText="Choose a strong password" Required="true" Class="mt-3"
+                          @bind-Value="model.Password" For="@(() => model.Password)" InputType="InputType.Password" />
+            <MudTextField T="string" Label="Confirm Password" HelperText="Repeat the password" Required="true"
+                          @bind-Value="model.ConfirmPassword" For="@(() => model.ConfirmPassword)" InputType="InputType.Password" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
+
 
 @code {
-    private RegisterModel RegisterModel = new();
+    private RegisterModel model = new RegisterModel();
     private EditContext editContext;
+    private bool success;
 
     protected override void OnInitialized()
     {
-        editContext = new EditContext(RegisterModel);
+        editContext = new EditContext(model);
     }
 
-    private async Task HandleSubmit()
+    private async Task OnSubmit()
     {
-        await FormHelper.HandleFormSubmission(editContext, RegisterModel, AuthService.Register, "/login");
+        await FormHelper.HandleFormSubmission(editContext, model, AuthService.Register, "/login");
     }
 }

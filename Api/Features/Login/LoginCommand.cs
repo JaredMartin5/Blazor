@@ -1,11 +1,12 @@
-﻿using MediatR;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Common;
 using Shared.Login;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Api.Features.Login;
 
@@ -18,30 +19,41 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult>
 {
     private readonly IConfiguration _configuration;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IValidator<LoginModel> _validator;
 
-    public LoginCommandHandler(IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+    public LoginCommandHandler(
+        IConfiguration configuration,
+        SignInManager<IdentityUser> signInManager,
+        IValidator<LoginModel> validator
+    )
     {
         _configuration = configuration;
         _signInManager = signInManager;
+        _validator = validator;
     }
 
     public async Task<ApiResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var result =
-            await _signInManager.PasswordSignInAsync(request.LoginModel.Email, request.LoginModel.Password, false,
-                false);
+        await _validator.ValidateAndThrowAsync(request.LoginModel, cancellationToken);
+
+        var result = await _signInManager.PasswordSignInAsync(
+            request.LoginModel.Email,
+            request.LoginModel.Password,
+            false,
+            false
+        );
 
         if (!result.Succeeded)
             return new ApiResult
             {
                 Successful = false,
-                Errors = new List<Error> { new(nameof(LoginModel.Email), "Username and password are invalid.") },
+                Errors = new List<Error>
+                {
+                    new(nameof(LoginModel.Email), "Username and password are invalid."),
+                },
             };
 
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.Name, request.LoginModel.Email)
-        };
+        var claims = new[] { new Claim(ClaimTypes.Name, request.LoginModel.Email) };
 
         var keyString = _configuration["JwtSecurityKey"] ?? string.Empty;
         if (keyString.Length < 32)
@@ -50,8 +62,10 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult>
                 Successful = false,
                 Errors = new List<Error>
                 {
-                    new(nameof(LoginModel.Email),
-                        "Security key is too short. It must be at least 32 characters long.")
+                    new(
+                        nameof(LoginModel.Email),
+                        "Security key is too short. It must be at least 32 characters long."
+                    ),
                 },
             };
 
@@ -70,7 +84,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResult>
         return new ApiResult
         {
             Successful = true,
-            Data = new JwtSecurityTokenHandler().WriteToken(token)
+            Data = new JwtSecurityTokenHandler().WriteToken(token),
         };
     }
 }
