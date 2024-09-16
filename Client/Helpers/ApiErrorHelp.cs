@@ -4,8 +4,8 @@ namespace Client.Helpers;
 
 public static class ErrorResultHelper
 {
-    public static List<ApiError> CreateGeneralError()
+    public static ApiErrorResult CreateGeneralError()
     {
-        return [new("general", "Failed to parse server response.")];
+        return new ApiErrorResult([new("general", "Failed to parse server response.")]);
     }
 }

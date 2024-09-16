@@ -10,12 +10,12 @@ using Shared.Login;
 
 namespace Api.Features.Login;
 
-public class LoginCommand : IRequest<OneOf<string, IEnumerable<ApiError>>>
+public class LoginCommand : IRequest<OneOf<string, ApiErrorResult>>
 {
     public LoginModel LoginModel { get; set; } = new();
 }
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, OneOf<string, IEnumerable<ApiError>>>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, OneOf<string, ApiErrorResult>>
 {
     private readonly IConfiguration _configuration;
     private readonly SignInManager<IdentityUser> _signInManager;
@@ -26,18 +26,18 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, OneOf<string, I
         _signInManager = signInManager;
     }
 
-    public async Task<OneOf<string, IEnumerable<ApiError>>> Handle(LoginCommand request, CancellationToken cancellationToken)
+    public async Task<OneOf<string, ApiErrorResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var signInResult = await _signInManager.PasswordSignInAsync(request.LoginModel.Email, request.LoginModel.Password, false, false);
 
         if (!signInResult.Succeeded)
-            return new List<ApiError> { new(nameof(LoginModel.Email), "Username and password are invalid.") };
+            return new ApiErrorResult([new(nameof(LoginModel.Email), "Username and password are invalid.")]);
 
         var claims = new[] { new Claim(ClaimTypes.Name, request.LoginModel.Email) };
 
         var keyString = _configuration["JwtSecurityKey"] ?? string.Empty;
         if (keyString.Length < 32)
-            return new List<ApiError> { new(nameof(LoginModel.Email), "Security key is too short. It must be at least 32 characters long.") };
+            return new ApiErrorResult([new(nameof(LoginModel.Email), "Security key is too short. It must be at least 32 characters long.")]);
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

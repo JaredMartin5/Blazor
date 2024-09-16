@@ -7,7 +7,7 @@ namespace Client.Services;
 
 public interface IAuthService
 {
-    Task<OneOf<string, List<ApiError>>> Login(LoginModel loginModel);
+    Task<OneOf<string, ApiErrorResult>> Login(LoginModel loginModel);
     Task Logout();
-    Task<OneOf<bool, List<ApiError>>> Register(RegisterModel registerModel);
+    Task<OneOf<bool, ApiErrorResult>> Register(RegisterModel registerModel);
 }

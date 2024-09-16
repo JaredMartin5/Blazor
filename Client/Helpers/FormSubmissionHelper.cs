@@ -14,7 +14,7 @@ public class FormSubmissionHelper
         _navigationManager = navigationManager;
     }
 
-    public async Task HandleFormSubmission<TModel, TResult>(EditContext editContext, TModel model, Func<TModel, Task<OneOf<TResult, List<ApiError>>>> submitFunc, string successNavigationUrl)
+    public async Task HandleFormSubmission<TModel, TResult>(EditContext editContext, TModel model, Func<TModel, Task<OneOf<TResult, ApiErrorResult>>> submitFunc, string successNavigationUrl)
     {
         ValidationHelper.ClearAllValidationMessages(editContext);
         editContext.Validate();
@@ -26,13 +26,13 @@ public class FormSubmissionHelper
             {
                 _navigationManager.NavigateTo(successNavigationUrl);
             },
-            errors =>
+            apiErrorResult =>
             {
                 if (Equals(model, null))
                 {
                     throw new Exception("Data is null");
                 }
-                foreach (var error in errors)
+                foreach (var error in apiErrorResult.Errors)
                 {
                     var correctedPropertyName = error.Property[..1].ToUpper() + error.Property[1..];
                     ValidationHelper.AddValidationError(editContext, model, correctedPropertyName, error.Message);
