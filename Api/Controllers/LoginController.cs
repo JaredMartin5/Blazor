@@ -1,9 +1,7 @@
 ﻿using Api.Features.Login;
-using Azure;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Login;
-using Shared.Register;
 
 namespace Api.Controllers;
 

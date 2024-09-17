@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Shared.Register;
+﻿namespace Shared.Register;
 
 public class RegisterModel
 {

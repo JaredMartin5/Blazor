@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Shared.Login;
+﻿namespace Shared.Login;
 
 public class LoginModel
 {
