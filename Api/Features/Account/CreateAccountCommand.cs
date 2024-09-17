@@ -34,7 +34,7 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
         var result = await _userManager.CreateAsync(newUser, request.RegisterModel.Password);
 
         if (!result.Succeeded)
-            return new ApiErrorResult(result.Errors.Select(e => new ApiError(nameof(RegisterModel.Email), e.Description)).ToList());
+            return new ApiErrorResult(result.Errors.Select(e => new ApiError(nameof(RegisterModel.Email), e.Description)));
 
         return true;
     }
