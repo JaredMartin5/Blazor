@@ -13,6 +13,8 @@ public class RegisterModelValidator : AbstractValidator<RegisterModel>
             .WithMessage("Password is required.")
             .MinimumLength(8)
             .WithMessage("Password must be at least 8 characters long.")
+            .MaximumLength(256)
+            .WithMessage("Password must be at most 256 characters long.")
             .Matches(@"[A-Z]")
             .WithMessage("Password must contain at least one uppercase letter.")
             .Matches(@"[a-z]")
@@ -22,10 +24,6 @@ public class RegisterModelValidator : AbstractValidator<RegisterModel>
             .Matches(@"[\!\?\*\.]")
             .WithMessage("Password must contain at least one special character (e.g. !, ?, *, .)");
 
-        RuleFor(x => x.ConfirmPassword)
-            .NotEmpty()
-            .WithMessage("Confirmation password is required.")
-            .Equal(x => x.Password)
-            .WithMessage("The password and confirmation password do not match.");
+        RuleFor(x => x.ConfirmPassword).NotEmpty().WithMessage("Confirmation password is required.").Equal(x => x.Password).WithMessage("The password and confirmation password do not match.");
     }
 }

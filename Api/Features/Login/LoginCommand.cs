@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Api.Extensions;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -31,15 +32,14 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, OneOf<string, A
 
     public async Task<OneOf<string, ApiErrorResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        await _validator.ValidateAndThrowAsync(request.LoginModel, cancellationToken);
+        var validationResult = await _validator.ValidateAsync(request.LoginModel, cancellationToken);
+        if (validationResult.Errors.Count != 0)
+            return validationResult.GetApiErrorResult();
+
         var result = await _signInManager.PasswordSignInAsync(request.LoginModel.Email, request.LoginModel.Password, false, false);
 
         if (!result.Succeeded)
-            return new ApiResult
-            {
-                Successful = false,
-                Errors = new List<Error> { new(nameof(LoginModel.Email), "Username and password are invalid."), },
-            };
+            return new ApiErrorResult([new(nameof(LoginModel.Email), "Username and password are invalid.")]);
 
         var claims = new[] { new Claim(ClaimTypes.Name, request.LoginModel.Email) };
 

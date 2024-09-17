@@ -6,23 +6,23 @@
 @inject FormSubmissionHelper FormHelper
 
 <EditForm EditContext="@editContext" OnSubmit="HandleLogin">
-<MudCard>
-    <MudCardContent>
-        <MudText Typo="Typo.h5">Log In</MudText>
+    <MudCard>
+        <MudCardContent>
+            <MudText Typo="Typo.h5">Log In</MudText>
             <FluentValidationValidator />
-
-            <MudTextField @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" Label="Email address" Required="true" />
-            <MudTextField @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" Label="Password" InputType="InputType.Password" Required="true" />
-
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
-                </MudCardActions>
-    </MudCardContent>
-</MudCard>
+            <MudTextField @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" Label="Email address"
+                Required="true" />
+            <MudTextField @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" Label="Password"
+                InputType="InputType.Password" Required="true" />
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit
+                </MudButton>
+            </MudCardActions>
+        </MudCardContent>
+    </MudCard>
 </EditForm>
 
 @code {
-
     private LoginModel loginModel = new();
     private EditContext editContext;
 

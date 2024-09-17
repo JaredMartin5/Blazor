@@ -11,6 +11,8 @@ public class LoginModelValidator : AbstractValidator<LoginModel>
             .WithMessage("Password is required.")
             .MinimumLength(8)
             .WithMessage("Password must be at least 8 characters long.")
+            .MaximumLength(256)
+            .WithMessage("Password must be at most 256 characters long.")
             .Matches(@"[A-Z]")
             .WithMessage("Password must contain at least one uppercase letter.")
             .Matches(@"[a-z]")
