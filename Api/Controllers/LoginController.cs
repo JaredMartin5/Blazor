@@ -1,15 +1,7 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Api.Features.Account;
-using Api.Features.Login;
+﻿using Api.Features.Login;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Shared;
 using Shared.Login;
-using Shared.Register;
 
 namespace Api.Controllers;
 

@@ -1,10 +1,11 @@
 using System.Text;
 using Api.Data;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Login;
 
 namespace Api
 {
@@ -14,12 +15,12 @@ namespace Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddValidatorsFromAssemblyContaining<LoginModelValidator>();
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
@@ -48,7 +49,7 @@ namespace Api
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["JwtIssuer"],
                         ValidAudience = builder.Configuration["JwtAudience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecurityKey"] ?? string.Empty))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSecurityKey"] ?? string.Empty)),
                     };
                 });
 
