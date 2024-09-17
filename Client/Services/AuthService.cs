@@ -29,8 +29,6 @@ public class AuthService : IAuthService
     public async Task<OneOf<bool, ApiErrorResult>> Register(RegisterModel registerModel)
     {
         var response = await _httpClient.PostAsJsonAsync("api/accounts", registerModel);
-        System.Console.WriteLine(await response.Content.ReadAsStringAsync());
-
         return response.StatusCode switch
         {
             HttpStatusCode.OK => await response.Content.ReadFromJsonAsync<bool>(),
@@ -43,13 +41,11 @@ public class AuthService : IAuthService
     {
         var loginAsJson = JsonSerializer.Serialize(loginModel);
         var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
-        System.Console.WriteLine(response.Content.ReadAsStringAsync());
-
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
             {
-                var loginResult = JsonSerializer.Deserialize<string>(await response.Content.ReadAsStringAsync())!;
+                var loginResult = await response.Content.ReadAsStringAsync();
                 await _localStorage.SetItemAsync("authToken", loginResult);
                 ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginResult);
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult);
