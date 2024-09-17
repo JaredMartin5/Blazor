@@ -19,6 +19,11 @@ public class FormSubmissionHelper
         ValidationHelper.ClearAllValidationMessages(editContext);
         editContext.Validate();
 
+        if (!editContext.Validate())
+        {
+            return;
+        }
+
         var result = await submitFunc(model);
 
         result.Switch(

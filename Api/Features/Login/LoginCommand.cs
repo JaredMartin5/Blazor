@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -19,19 +20,26 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, OneOf<string, A
 {
     private readonly IConfiguration _configuration;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IValidator<LoginModel> _validator;
 
-    public LoginCommandHandler(IConfiguration configuration, SignInManager<IdentityUser> signInManager)
+    public LoginCommandHandler(IConfiguration configuration, SignInManager<IdentityUser> signInManager, IValidator<LoginModel> validator)
     {
         _configuration = configuration;
         _signInManager = signInManager;
+        _validator = validator;
     }
 
     public async Task<OneOf<string, ApiErrorResult>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var signInResult = await _signInManager.PasswordSignInAsync(request.LoginModel.Email, request.LoginModel.Password, false, false);
+        await _validator.ValidateAndThrowAsync(request.LoginModel, cancellationToken);
+        var result = await _signInManager.PasswordSignInAsync(request.LoginModel.Email, request.LoginModel.Password, false, false);
 
-        if (!signInResult.Succeeded)
-            return new ApiErrorResult([new(nameof(LoginModel.Email), "Username and password are invalid.")]);
+        if (!result.Succeeded)
+            return new ApiResult
+            {
+                Successful = false,
+                Errors = new List<Error> { new(nameof(LoginModel.Email), "Username and password are invalid."), },
+            };
 
         var claims = new[] { new Claim(ClaimTypes.Name, request.LoginModel.Email) };
 
