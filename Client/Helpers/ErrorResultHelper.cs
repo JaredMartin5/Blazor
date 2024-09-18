@@ -1,19 +1,11 @@
 ﻿using Shared.Common;
 
-namespace Client.Helpers
+namespace Client.Helpers;
+
+public static class ErrorResultHelper
 {
-    public class ErrorResultHelper
+    public static ApiErrorResult CreateGeneralError()
     {
-        public static async Task<ApiResult<T>> CreateErrorResult<T>(string propertyName)
-            where T : class
-        {
-            return await Task.FromResult(
-                new ApiResult<T>
-                {
-                    Successful = false,
-                    Errors = new List<Error> { new(propertyName, "Failed to parse server response.") }
-                }
-            );
-        }
+        return new ApiErrorResult([new("general", "Failed to parse server response.")]);
     }
 }

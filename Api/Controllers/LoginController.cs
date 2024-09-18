@@ -20,7 +20,6 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
     {
         var result = await _mediator.Send(new LoginCommand { LoginModel = loginModel });
-
-        return result.Successful ? Ok(result) : BadRequest(result);
+        return result.Match<IActionResult>(Ok, BadRequest);
     }
 }

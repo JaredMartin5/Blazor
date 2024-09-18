@@ -12,7 +12,6 @@
         <MudCardContent>
             <MudText Typo="Typo.h5">Register</MudText>
             <FluentValidationValidator />
-
             <MudTextField Label="Email" Class="mt-3" Required="true"
                           @bind-Value="model.Email" For="@(() => model.Email)" />
             <MudTextField Label="Password" HelperText="Choose a strong password" Required="true" Class="mt-3"
@@ -30,7 +29,6 @@
 @code {
     private RegisterModel model = new RegisterModel();
     private EditContext editContext;
-    private bool success;
 
     protected override void OnInitialized()
     {

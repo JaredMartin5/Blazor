@@ -10,7 +10,6 @@ namespace Client
         public static void AddValidationError(EditContext editContext, object model, string propertyName, string errorMessage)
         {
             var messageStore = _validationMessageStores.GetOrAdd(editContext, context => new ValidationMessageStore(context));
-
             var fieldIdentifier = new FieldIdentifier(model, propertyName);
 
             messageStore.Clear(fieldIdentifier);
