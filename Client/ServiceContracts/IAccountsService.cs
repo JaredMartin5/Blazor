@@ -1,13 +1,11 @@
 ﻿using OneOf;
 using Shared.Common;
-using Shared.Login;
 using Shared.Register;
 
-namespace Client.Services;
+namespace Client.ServiceContracts;
 
-public interface IAuthService
+public interface IAccountsService
 {
-    Task<OneOf<string, ApiErrorResult>> Login(LoginModel loginModel);
     Task Logout();
     Task<OneOf<bool, ApiErrorResult>> Register(RegisterModel registerModel);
 }

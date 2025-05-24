@@ -1,5 +1,4 @@
-﻿using Api.Features.Account;
-using MediatR;
+﻿using Business.Account;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Register;
 
@@ -9,17 +8,18 @@ namespace Api.Controllers;
 [ApiController]
 public class AccountsController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IRegisterAccountService _registerAccountService;
 
-    public AccountsController(IMediator mediator)
+    public AccountsController(IRegisterAccountService registerAccountService)
     {
-        _mediator = mediator;
+        _registerAccountService = registerAccountService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] RegisterModel registerModel)
+    public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
     {
-        var result = await _mediator.Send(new CreateAccountCommand { RegisterModel = registerModel });
+        var result = await _registerAccountService.RegisterAccount(registerModel);
+
         return result.Match<IActionResult>(x => Ok(x), BadRequest);
     }
 }

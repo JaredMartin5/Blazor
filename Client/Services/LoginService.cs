@@ -1,46 +1,35 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Blazored.LocalStorage;
 using Client.Helpers;
+using Client.ServiceContracts;
 using Microsoft.AspNetCore.Components.Authorization;
 using OneOf;
 using Shared.Common;
 using Shared.Login;
-using Shared.Register;
 
 namespace Client.Services;
 
-public class AuthService : IAuthService
+public class LoginService : ILoginService
 {
     private readonly HttpClient _httpClient;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly ILocalStorageService _localStorage;
 
-    public AuthService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage)
+    public LoginService(HttpClient httpClient, AuthenticationStateProvider authenticationStateProvider, ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
         _authenticationStateProvider = authenticationStateProvider;
         _localStorage = localStorage;
     }
 
-    public async Task<OneOf<bool, ApiErrorResult>> Register(RegisterModel registerModel)
-    {
-        var response = await _httpClient.PostAsJsonAsync("api/accounts", registerModel);
-        return response.StatusCode switch
-        {
-            HttpStatusCode.OK => await response.Content.ReadFromJsonAsync<bool>(),
-            HttpStatusCode.BadRequest => await response.Content.ReadFromJsonAsync<ApiErrorResult>() ?? ErrorResultHelper.CreateGeneralError(),
-            _ => ErrorResultHelper.CreateGeneralError()
-        };
-    }
-
     public async Task<OneOf<string, ApiErrorResult>> Login(LoginModel loginModel)
     {
         var loginAsJson = JsonSerializer.Serialize(loginModel);
-        var response = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
+        var response = await _httpClient.PostAsync("api/login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
         switch (response.StatusCode)
         {
             case HttpStatusCode.OK:
@@ -57,12 +46,5 @@ public class AuthService : IAuthService
             default:
                 return ErrorResultHelper.CreateGeneralError();
         }
-    }
-
-    public async Task Logout()
-    {
-        await _localStorage.RemoveItemAsync("authToken");
-        ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
-        _httpClient.DefaultRequestHeaders.Authorization = null;
     }
 }
