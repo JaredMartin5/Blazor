@@ -1,11 +1,12 @@
 ﻿@page "/register"
 @using System.ComponentModel.DataAnnotations
 @using Client.Helpers
+@using Client.ServiceContracts
 @using Client.Services
-@using Shared.Register
 @using MudBlazor
-@inject IAuthService AuthService
+@using Shared.Register
 @inject FormSubmissionHelper FormHelper
+@inject IAccountsService AccountsService
 
 <EditForm EditContext="@editContext" OnSubmit="OnSubmit">
     <MudCard>
@@ -37,6 +38,6 @@
 
     private async Task OnSubmit()
     {
-        await FormHelper.HandleFormSubmission(editContext, model, AuthService.Register, "/login");
+        await FormHelper.HandleFormSubmission(editContext, model, AccountsService.Register, "/login");
     }
 }

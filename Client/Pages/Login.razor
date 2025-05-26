@@ -1,8 +1,9 @@
 ﻿@page "/login"
+@using Client.Helpers
+@using Client.ServiceContracts
 @using Client.Services
 @using Shared.Login
-@using Client.Helpers
-@inject IAuthService AuthService
+@inject ILoginService LoginService
 @inject FormSubmissionHelper FormHelper
 
 <EditForm EditContext="@editContext" OnSubmit="HandleLogin">
@@ -33,6 +34,6 @@
 
     private async Task HandleLogin()
     {
-        await FormHelper.HandleFormSubmission(editContext, loginModel, AuthService.Login, "/");
+        await FormHelper.HandleFormSubmission(editContext, loginModel, LoginService.Login, "/");
     }
 }

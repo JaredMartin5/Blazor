@@ -1,5 +1,4 @@
-﻿using Api.Features.Login;
-using MediatR;
+﻿using Business.Login;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Login;
 
@@ -9,17 +8,18 @@ namespace Api.Controllers;
 [ApiController]
 public class LoginController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly ILoginService _loginService;
 
-    public LoginController(IMediator mediator)
+    public LoginController(ILoginService loginService)
     {
-        _mediator = mediator;
+        _loginService = loginService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+    public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        var result = await _mediator.Send(new LoginCommand { LoginModel = loginModel });
+        var result = await _loginService.LoginAsync(model);
+
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 }

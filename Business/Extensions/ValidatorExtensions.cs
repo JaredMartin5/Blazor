@@ -1,7 +1,7 @@
 using FluentValidation.Results;
 using Shared.Common;
 
-namespace Api.Extensions;
+namespace Business.Extensions;
 
 public static class ValidatorExtensions
 {
