@@ -1,10 +1,12 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Blazored.LocalStorage;
 using Client.Helpers;
 using Client.ServiceContracts;
 using Microsoft.AspNetCore.Components.Authorization;
 using OneOf;
+using Shared.AccountUser;
 using Shared.Common;
 using Shared.Register;
 
@@ -39,5 +41,13 @@ public class AccountsService : IAccountsService
         await _localStorage.RemoveItemAsync("authToken");
         ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsLoggedOut();
         _httpClient.DefaultRequestHeaders.Authorization = null;
+    }
+
+    public async Task<OneOf<List<AccountUserDto>, ApiErrorResult>> GetAllAccounts()
+    {
+        var response = await _httpClient.GetAsync("api/accounts/table");
+        if (response.IsSuccessStatusCode)
+            return await response.Content.ReadFromJsonAsync<List<AccountUserDto>>() ?? [];
+        return await response.Content.ReadFromJsonAsync<ApiErrorResult>() ?? ErrorResultHelper.CreateGeneralError();
     }
 }

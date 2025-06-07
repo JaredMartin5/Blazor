@@ -1,0 +1,46 @@
+﻿@page "/accounts"
+@using Microsoft.AspNetCore.Authorization
+@using Client.ServiceContracts
+@using Shared.AccountUser
+@using Shared.Common
+@inject IAccountsService AccountsService
+@attribute [Authorize]
+
+<h3>Accounts</h3>
+
+@if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (errorMessage is not null)
+{
+    <MudAlert Severity="Severity.Error">@errorMessage</MudAlert>
+}
+else if (accounts is not null)
+{
+    <MudTable Items="accounts">
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">@context.Email</MudTd>
+        </RowTemplate>
+    </MudTable>
+}
+
+@code {
+    private List<AccountUserDto>? accounts;
+    private string? errorMessage;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var result = await AccountsService.GetAllAccounts();
+        result.Switch(
+            list => accounts = list,
+            error => errorMessage = error.Errors.FirstOrDefault()?.Message ?? "Unknown error"
+        );
+        isLoading = false;
+    }
+}

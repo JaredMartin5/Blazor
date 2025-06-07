@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using Business.Extensions;
 using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -16,13 +15,13 @@ namespace Business.Login;
 public class LoginService : ILoginService
 {
     private readonly IConfiguration _configuration;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
     private readonly IValidator<LoginModel> _validator;
 
-    public LoginService(IConfiguration configuration, SignInManager<IdentityUser> signInManager, IValidator<LoginModel> validator)
+    public LoginService(IConfiguration configuration, UserManager<IdentityUser> userManager, IValidator<LoginModel> validator)
     {
         _configuration = configuration;
-        _signInManager = signInManager;
+        _userManager = userManager;
         _validator = validator;
     }
 
@@ -32,8 +31,12 @@ public class LoginService : ILoginService
         if (validationResult.Errors.Count != 0)
             return validationResult.GetApiErrorResult();
 
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-        if (!result.Succeeded)
+        var user = await _userManager.FindByEmailAsync(model.Email!);
+        if (user == null)
+            return new ApiErrorResult([new(nameof(LoginModel.Email), "Username and password are invalid.")]);
+
+        var result = await _userManager.CheckPasswordAsync(user, model.Password!);
+        if (!result)
             return new ApiErrorResult([new(nameof(LoginModel.Email), "Username and password are invalid.")]);
 
         var claims = new[] { new Claim(ClaimTypes.Name, model.Email!) };
